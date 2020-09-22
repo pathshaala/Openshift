@@ -1,0 +1,71 @@
+# preconfiguration:
+
+# az login
+
+# az account list --output table
+# az account set --subscription "My Demos"
+
+-------
+Resource group:
+command to create new resource group.
+# az group create --name MyResourceGroup --location "East US"
+
+------
+DNS Domain: https://docs.microsoft.com/en-us/azure/dns/dns-getstarted-cli
+command to create DNS zone
+# az network dns zone create -g MyResourceGroup -n contoso.xyz
+
+view:
+# az network dns record-set list -g MyResourceGroup -z contoso.xyz
+-----
+Create the service principal:
+# az ad sp create-for-rbac --role Contributor --name <service_principal> 
+- Record the values of the appId and password parameters from the previous output
+
+Grant additional permissions to the service principal :
+# az role assignment create --role "User Access Administrator" \
+    --assignee-object-id $(az ad sp list --filter "appId eq '<appId>'" \ 
+       | jq '.[0].objectId' -r)
+
+assign the Azure Active Directory Graph permission:
+# az ad app permission add --id <appId> \ 
+     --api 00000002-0000-0000-c000-000000000000 \
+     --api-permissions 824c81eb-e3f8-4ee6-8f6d-de7f50d565b7=Role
+
+Approve the permissions request.: 
+# az ad app permission grant --id <appId> \ 
+     --api 00000002-0000-0000-c000-000000000000
+
+
+---------
+
+
+Pull secret: https://cloud.redhat.com/openshift/install/pull-secret
+
+OCP installer: https://cloud.redhat.com/openshift/install
+$ tar xvf <installation_program>.tar.gz
+
+
+Generating an SSH private key and adding it to the agent:-
+$ ssh-keygen -t rsa -b 4096 -N '' \
+    -f <path>/<file_name>
+
+$ eval "$(ssh-agent -s)"
+
+$ ssh-add <path>/<file_name> 
+
+
+----------------
+Install: 
+$ ./openshift-install create cluster --dir=<installation_directory> \ 
+    --log-level=info
+    [warn, debug, or error]
+
+-----------------
+Post Install :-
+
+OCP cli: 
+
+$ export KUBECONFIG=<installation_directory>/auth/kubeconfig
+DNS wild card entry- 
+# 

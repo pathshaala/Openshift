@@ -1,0 +1,18 @@
+### OpenShift installer
+wget https://mirror.openshift.com/pub/openshift-v4/clients/ocp/latest/openshift-install-mac.tar.gz
+wget https://mirror.openshift.com/pub/openshift-v4/clients/ocp/latest/openshift-install-linux.tar.gz
+
+### Pull secret:
+<>
+{}
+
+
+### Command line interface
+
+wget https://mirror.openshift.com/pub/openshift-v4/clients/ocp/latest/openshift-client-mac.tar.gz
+wget https://mirror.openshift.com/pub/openshift-v4/clients/ocp/latest/openshift-client-linux.tar.gz
+
+### Instaltion:
+
+https://docs.openshift.com/container-platform/4.5/installing/installing_azure/installing-azure-default.html
+./openshift-install create cluster
