@@ -8,8 +8,9 @@
 -------
 Resource group:
 command to create new resource group.
+'''
 # az group create --name MyResourceGroup --location "East US"
-
+'''
 ------
 DNS Domain: https://docs.microsoft.com/en-us/azure/dns/dns-getstarted-cli
 command to create DNS zone

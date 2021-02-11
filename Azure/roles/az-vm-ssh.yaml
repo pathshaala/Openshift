@@ -1,0 +1,70 @@
+# Description
+# ===========
+# This playbook create an Azure VM with public IP, and open 22 port for SSH, and add ssh public key to the VM.
+# This playbook create an Azure VM with public IP
+# Change variables below to customize your VM deployment
+
+- name: Create Azure VM
+  hosts: localhost
+  connection: local
+  vars:
+    resource_group: "{{ resource_group_name }}"
+    vm_name: testvm
+    location: eastus
+    ssh_key: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQCvEk/5sD6pTcJVWdEhoM/jhCUWxamLVAi1sox8eoL5hX6j6NsFRtRkPK/HUEuelO7vYin74XN6tEaWbOulyYy2LJiel2oKcorgVG37CgjmOexO3v6YYFlGlpK+K0vinxsEw/kA2BifyKOXHH0retYB2NZKf4wsGTCMtR+p3R0yaQGZ32i5WUxtgBWMGjfb+KYKzarshUlgdV3a/oqj9ER8VEiWc8KHBvEYPZX2TgYgPAdIrcAJumF8JRtZW6JRcDHmpEtenJvO2CPtEWyH7xUijH2Zed4D8XY011u07GFt41Wvk4Xxt9Rv7f+okbyGx+l6l1B/IQPnEFRtwoNQz7np9XhjSqHT3Dd/0TimhaY5Qm4YcQWfjrI+lsdo1esAPEFNJTakYHDKUMVbi3WfZ9uKSlBc0huOFXV4Y7AuWYCeD97E53agKns0XF3beSnvU1WY+5ByKNjJ6SclFslrZ8tKrQ8Fr9VicO7QBciEYovhRqnw8xY1DJcRXgnYeZJH6g4SABOhdZRb4OZk47FDDAuwDGod9iiRrA2WpaeZ39PaXcE2mGModi5emZudw3R2zMSb+kv1jxK2A/xGlz4q+xv3jDtykJQn2tVVWzWPcZrCF4ndfLcGQxN/FVGZWva2mxK1MGcQPfMucPLNfFwEJA7M+W86v8PRGeLpTk0/FZ9INw== gsi-ibmcloud"
+  tasks:
+  - name: Create a resource group
+    azure_rm_resourcegroup:
+        name: "{{ resource_group }}"
+        location: "{{ location }}"
+  - name: Create virtual network
+    azure_rm_virtualnetwork:
+      resource_group: "{{ resource_group }}"
+      name: "{{ vm_name }}"
+      address_prefixes: "10.0.0.0/16"
+  - name: Add subnet
+    azure_rm_subnet:
+      resource_group: "{{ resource_group }}"
+      name: "{{ vm_name }}"
+      address_prefix: "10.0.1.0/24"
+      virtual_network: "{{ vm_name }}"
+  - name: Create public IP address
+    azure_rm_publicipaddress:
+      resource_group: "{{ resource_group }}"
+      allocation_method: Static
+      name: "{{ vm_name }}"
+  - name: Create Network Security Group that allows SSH
+    azure_rm_securitygroup:
+      resource_group: "{{ resource_group }}"
+      name: "{{ vm_name }}"
+      rules:
+        - name: SSH
+          protocol: Tcp
+          destination_port_range: 22
+          access: Allow
+          priority: 1001
+          direction: Inbound
+  - name: Create virtual network inteface card
+    azure_rm_networkinterface:
+      resource_group: "{{ resource_group }}"
+      name: "{{ vm_name }}"
+      virtual_network: "{{ vm_name }}"
+      subnet: "{{ vm_name }}"
+      public_ip_name: "{{ vm_name }}"
+      security_group: "{{ vm_name }}"
+  - name: Create VM
+    azure_rm_virtualmachine:
+      resource_group: "{{ resource_group }}"
+      name: "{{ vm_name }}"
+      vm_size: Standard_DS1_v2
+      admin_username: azureuser
+      ssh_password_enabled: false
+      ssh_public_keys:
+        - path: /home/azureuser/.ssh/authorized_keys
+          key_data: "{{ ssh_key }}"
+      network_interfaces: "{{ vm_name }}"
+      image:
+        offer: UbuntuServer
+        publisher: Canonical
+        sku: 16.04-LTS
+        version: latest

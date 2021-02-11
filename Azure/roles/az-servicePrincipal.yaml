@@ -1,0 +1,19 @@
+vars_prompt:
+- name: AZURE_SUBSCRIPTION_ID
+    prompt: Azure Subscriptions to use
+    default: "d8ef728e-06ba-4ff5-b098-67d706eedab8"
+- name: AZURE_CLIENT_ID
+    prompt: Azure App ID / Client ID for Service Principal
+    default: "3f7f1452-09b6-49b9-9cee-59de1eb95ac0"
+- name: AZURE_SECRET
+    prompt: Azure Secret for Service Principal
+    private: yes
+    encrypt: sha512_crypt
+    confirm: yes
+    default: "zvhs79_SrSmsa-Jfa7fcb7qkrY6rSGVwLb"
+- name: AZURE_TENANT
+    prompt: Azure Tenant for Service Principal
+    default: "ad08fec0-b961-4cc4-bcf8-c676b0e56453"
+
+- hosts: azure
+  
